@@ -2,7 +2,7 @@
 title: Introdução à Linguagem de Programação em R para tratamento de dados de poluição do ar
 subtitle: R básico e data frames
 author: Mario Gavidia-Calderón, Rafaela Squizzato, Thiago Nogueira
-date: 05/02/2024
+date: 17/02/2025
 institute: Universidade de São Paulo
 output: binb::metropolis
 fontsize: 12pt
@@ -11,21 +11,23 @@ toc: true
 ---
 
 ```{r,setup, include=FALSE}
-knitr::opts_chunk$set(cache=TRUE)
+knitr::opts_chunk$set(cache =TRUE, warning = FALSE)
 ```
 
 # Introdução
 
 ## Por que o curso?
 ### Efeitos adversos à saúde
+
 ```{r, echo=FALSE, fig.align='center'}
-include_graphics("figures/silent_killer.jpg")
+library(knitr)
+include_graphics('figures/silent_killer.jpg')
 ```
 
 ## Por que o curso?
 ### **Carga global de doenças** da poluição do ar em 2015:
-- \alert{19 \%} de todas as mortes cardiovasculares.
-- \alert{23 \%} de toas as mortes por câncer de pulmão.
+- \alert{19 \%} de todas as mortes **cardiovasculares**.
+- \alert{23 \%} de toas as mortes por **câncer de pulmão**.
 
 ```{r, echo=FALSE, fig.align='center', out.width="55%"}
 include_graphics("figures/air_pol_deaths.png")
@@ -59,12 +61,6 @@ _\"Data! Data! Data!\" He cried impatiently. \"I can't make bricks without clay.
 * Analizadores de poluentes medem concentrações com maior frequência.
 * R é uma ótima ferramenta para mexer com dados.
 * É importante conhecer uma linguagem de programação.
-
-## Um questionário
-
-```{r, echo=FALSE, fig.align='center'}
-include_graphics("figures/qr_code_R.png")
-```
 
 
 ## Por que R?
