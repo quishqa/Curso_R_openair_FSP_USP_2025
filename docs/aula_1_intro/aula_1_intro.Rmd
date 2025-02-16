@@ -43,24 +43,26 @@ include_graphics("figures/air_pol_risks.png")
 
 ::: columns
 :::: column
-\
-_\"Data! Data! Data!\" He cried impatiently. \"I can't make bricks without clay.\"_\
-\
-\scriptsize Arthur Conan Doyle, The Adventure of the Copper Beeches- a Sherlock Holmes Short Story.
-::::
-
-:::: column
 - Precisamos conhecer o \alert{nível da poluição}.
 - Para isso precisamos de medições: \alert{dados}.
 - Este curso tem como objetivo mostrar como \alert{trabalhar com dados de poluição do ar no R}.
 ::::
+
+:::: column
+\
+_\"Data! Data! Data!\" He cried impatiently. \"I can't make bricks without clay.\"_\
+\
+\scriptsize Arthur Conan Doyle, The Adventure of the Copper Beeches- a Sherlock Holmes Short Story.
+
+::::
 :::
+
 ## Por que o curso?
 
 ### Além disso
-* Analizadores de poluentes medem concentrações com maior frequência.
-* R é uma ótima ferramenta para mexer com dados.
-* É importante conhecer uma linguagem de programação.
+* Analizadores de poluentes medem concentrações **com maior frequência**.
+* R é uma ótima ferramenta para **mexer com dados**.
+* É importante conhecer uma **linguagem de programação**.
 
 
 ## Por que R?
@@ -90,6 +92,7 @@ include_graphics("figures/Rlogo.png")
 - É _open source_ (é **livre**).
 - Funciona em qualquer **sistema operacional**.
 - Podemos trabalhar **com muitos dados** e **tipos de dados**.
+- Uma linguagen popular em [**data science**](https://www.datacamp.com/blog/top-programming-languages-for-data-scientists-in-2022).
 - Grande comunidade de usuários: **Muita ajuda on-line**.
 - **Reprodutibilidade** das ciências.
 ::::
@@ -106,7 +109,7 @@ include_graphics("figures/Rlogo.png")
 ::: columns
 :::: column
 - Muitos **pacotes** para muitas áreas das ciências.
-    - `openair` $\rightarrow$ poluição do ar.
+    - **`openair`** $\rightarrow$ poluição do ar.
     - `sf` e `raster` $\rightarrow$ GIS.
     - `Rmarkdown` $\rightarrow$ Documentos e apresentações.
     - `shiny` $\rightarrow$ aplicações e _dashboards_.
@@ -119,6 +122,33 @@ include_graphics("figures/Rlogo.png")
 ```
 ::::
 :::
+
+
+
+## Antes de começar
+
+\textsc{Lei de Murphy:}\
+
+_Se algo pode dar errado, dará._
+
+## Antes de começar
+
+Muitos erros podem ser causados porque: 
+
+- R é _case-sensitive_:\ `uma_variavel` $\neq$ `Uma_variavel`.
+- Faltou fechar os `( )` 
+- Esqueceram de colocar uma `,`
+
+\alert{Atentos} ao seguir os exemplos.
+
+(Mas tudo bem, os erros são grandes professores :) )
+
+## Antes de começar
+
+Por favor,  \alert{façam perguntas}
+```{r, echo=FALSE, fig.align='center', fig.cap="Questions. Fonte: https://xkcd.com/1256/", out.height="68%"}
+include_graphics("figures/questions_2x.png")
+```
 
 # RStudio
 
@@ -134,14 +164,17 @@ include_graphics("figures/rstudio-panes-labeled.jpeg")
    - `Ctrl + 2` : Janela console.
    - `Alt + - ` : `<-`
    - `Ctrl + d` : Apaga linha.
-   - `TAB`: Autocompleta nome de funções e diretórios de arquivos.
+   - `TAB`: \alert{Autocompleta} nome de funções e diretórios de arquivos.
 - Na console, $\uparrow$ e $\downarrow$ procura comandos anteriores.
 
 ## RStudio
-- No scripts
+- No janela scripts
    - `Alt + shift + ` $\downarrow$: Copia linha.
    - `Ctrl + Enter`: Executa a linha.
    - `Ctrl + a`: Seleciona todo o script.
+
+
+
 
 # Sintaxe Básica
 
@@ -160,22 +193,6 @@ knitr::include_graphics('figures/TTM.jpg')
 ::::
 :::
 
-## Antes de começar
-::: columns
-:::: column
-\textsc{Lei de Murphy}\
-
-_Se algo pode dar errado, dará._
-
-::::
-
-:::: column
-- R é _case-sensitive_:\ `uma_variavel` $\neq$ `Uma_variavel`.
-- Lembrem de fechar os `( )` 
-- Lembrem das `,`
-- \alert{Atentos} ao seguir os exemplos.
-::::
-:::
 
 
 ## R como calculadora
@@ -339,10 +356,10 @@ paste("o3", pol_atr, sep = "_")
 
 ## R: Objetos - `data frames`
 - Um `data frame` é uma **tabela**
-- Uma matriz **indexada**: tem nomes das **colunas** e **linhas**.
-- Cada **coluna** é uma **variável**.
-- Cada **linha** é uma **observação**.
-- Um conjunto de vetores.
+  - Uma matriz **indexada**: tem nomes das **colunas** e **linhas**.
+  - Cada **coluna** é uma **variável**.
+  - Cada **linha** é uma **observação**.
+  - Um conjunto de **vetores**.
 
 ##  `data frame`
 - Criamos um **`data frame`** usando a função **`data.frame()`**
