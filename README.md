@@ -15,6 +15,13 @@ tinytext::install_tinytext()
 install.packages("binb") # Tema dos slides
 ```
 
+## Temário
+
+- Aula 1: R básico e data frames.
+- Aula 2: Mais data frames e qualR.
+- Aula 3: openair.
+- Aula 4: Extras e estudo de casos.
+
 ## Professores
 
 - Mario Gavidia-Calderón (mario.calderon@iag.usp.br)
