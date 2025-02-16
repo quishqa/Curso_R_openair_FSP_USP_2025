@@ -482,7 +482,7 @@ pqa_sp$pm <- c(1, 1, 32 + 16 * 2, 14 + 16 * 2, 16 * 3, 12 + 16, 1, 1, 207.2)
 
 ## `data frames`: Ler arquivos `.csv`
 
-- Vamos ler dados do ano 2023 do aeroporto de Guarulhos.
+- Vamos ler dados do ano 2024 do aeroporto de Guarulhos.
 - Os dados são baixados do site [**ASOS Network da Iowa State University**](https://mesonet.agron.iastate.edu/request/download.phtml?network=BR__ASOS).
 - No R para ler tabelas em csv (e para outros formatos) usamos a função \alert{`read.table()`}.
 - Esta função precisa saber o **diretório do arquivo**. Para isso podemos usar a função **`file.choose()`**.
@@ -542,7 +542,7 @@ sd(gru$tc, na.rm = TRUE)
 
 ## Exercio 3
 
-- Baixe os dados do aeroporto de campo de marte para o ano 2023.
+- Baixe os dados do aeroporto de campo de marte para o ano 2024 (SBMT).
 - Transforme a Temperatura para Celcius, e a velocidade do vento para m s$^{-1}$.
 - Existen datos faltantes?
 - Todos as colunas foram lidas corretamente?
@@ -551,7 +551,7 @@ sd(gru$tc, na.rm = TRUE)
 ```{r, eval=FALSE}
 plot(gru$tc, # vetor para plotar
      t = "l", # tipo de plot, l = linha
-     xlab = "2023", # nome do eixo x
+     xlab = "2024", # nome do eixo x
      ylab = "Temperatura (C)", # nome eixo y
      col = "orange", # color da linha
      lwd = 1.25 # largura linha
@@ -562,7 +562,7 @@ plot(gru$tc, # vetor para plotar
 ```{r, echo=FALSE}
 plot(gru$tc, 
      t = "l",
-     xlab = "2023",
+     xlab = "2024",
      ylab = "Temperatura (C)",
      col = "orange",
      lwd = 1.25)
