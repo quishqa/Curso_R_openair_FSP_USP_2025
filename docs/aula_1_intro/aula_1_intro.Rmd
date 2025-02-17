@@ -1,18 +1,24 @@
 ---
 title: Introdução à Linguagem de Programação em R para tratamento de dados de poluição do ar
-subtitle: R básico e data frames
 author: Mario Gavidia-Calderón, Rafaela Squizzato, Thiago Nogueira
 date: 17/02/2025
 institute: Universidade de São Paulo
 output: binb::metropolis
 fontsize: 12pt
 classoption: aspectratio=169 
-toc: true
+toc: false
 ---
 
 ```{r,setup, include=FALSE}
 knitr::opts_chunk$set(cache =TRUE, warning = FALSE)
 ```
+
+## Programa do curso
+
+### Dia 1: Introdução, R básico e data frames.
+### Dia 2: Mais data frames e qualR.
+### Dia 3: Openair.
+### Dia 4: Mais openair e estudo de casos.
 
 # Introdução
 
@@ -149,6 +155,8 @@ Por favor,  \alert{façam perguntas}
 ```{r, echo=FALSE, fig.align='center', fig.cap="Questions. Fonte: https://xkcd.com/1256/", out.height="68%"}
 include_graphics("figures/questions_2x.png")
 ```
+
+# R Básico e data frames
 
 # RStudio
 
