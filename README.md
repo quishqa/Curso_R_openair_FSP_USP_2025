@@ -15,6 +15,12 @@ tinytext::install_tinytext()
 install.packages("binb") # Tema dos slides
 ```
 
+## Conteudo
+
+- `docs` tem as apresentações e códigos de cada aula.
+- `scripts` tem os codigos _ao vivo_ durante as aulas e outros exemplos.
+- `data` bases de dados e exemplos usados durante as aulas.
+
 ## Temário
 
 - Aula 1: R básico e data frames.
