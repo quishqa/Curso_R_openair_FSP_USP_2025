@@ -1,0 +1,467 @@
+---
+title: Introdução à Linguagem de Programação em R para tratamento de dados de poluição do ar
+subtitle: Data frames, qualR, e plots
+author: Mario Gavidia-Calderón, Rafaela Squizzato, Thiago Nogueira
+date: 18/02/2025
+institute: Universidade de São Paulo
+output: binb::metropolis
+fontsize: 12pt
+classoption: aspectratio=169 
+toc: true
+---
+
+```{r,setup, include=FALSE}
+knitr::opts_chunk$set(cache=TRUE)
+```
+
+# Resumo aula passada
+
+# Exemplo usando dados CETESB
+
+## Rede de monitoramento de qualidade do ar CETESB
+
+- Uma das melhores da região (Riojas-Rodríguez et al., 2016)
+- \alert{> 60} estações **automáticas**.
+- \alert{~22} estações manuais
+- \alert{2} estações movies
+- O3, NO, NO2, CO, PM2.5, PM10, SO2
+- Dados \alert{abertos}!
+
+## Sistema QUALAR
+
+- A plataforma permite **baixar e visualizar** a informação da rede de monitoramento.
+- https://qualar.cetesb.sp.gov.br/qualar/home.do 
+- Exercicio 1: Criar conta
+
+## Sistema QUALAR
+
+- Vamos baixar dados de **Novembro de 2023**.
+  - Estação Pinheiros.
+  - Parâmetros: O3, MP2.5, Velocidade do vento.
+  - DEMO.
+  
+## Leer arquivo
+
+```{r, eval=FALSE}
+pin <- read.table(
+  "~/Downloads/1739840283882.csv",
+  header = F, # Não tem nome das colunas
+  sep = ";",  # O separador das colunas é ;
+  dec = ",",  # O separador decimal é ,
+  skip = 8).  # Vai ler o arquivo desde a linha 8
+
+```
+
+## Leer arquivo
+
+- Exploramos usando `head(pin)`
+```{r, echo = F}
+pin <- read.table("../../data/pin_nov_2023.csv", header = F,
+                  sep = ";", dec = ",", skip = 8)
+head(pin)
+```
+
+## Trocar nomes das colunas
+```{r}
+names(pin) <- c("day", "hour", "pm25", "o3", "ws")
+head(pin)
+
+```
+
+## AED
+
+- Vamos calcular a média, max, min, sd e mediana do **ozônio**.
+```{r}
+mean(pin$o3, na.rm = T)
+median(pin$o3, na.rm = T)
+```
+
+## AED
+
+- Vamos calcular a média, max, min, sd e mediana do **ozônio**.
+```{r}
+max(pin$o3, na.rm = T)
+min(pin$o3, na.rm = T)
+```
+
+
+## Funções úteis
+
+- `print()`
+```{r}
+o3_mean <- mean(pin$o3, na.rm = T)
+print(o3_mean)
+```
+## Funções úteis
+
+- `paste()`
+```{r}
+pin_o3_mean <- mean(pin$o3, na.rm = T)
+print(paste("A media horaria de O3:",  pin_o3_mean))
+```
+
+## Funções úteis
+
+- `round()`
+```{r}
+print(paste("A media horaria de O3:",  round(pin_o3_mean)))
+print(paste("A media horaria de O3:",  round(pin_o3_mean, 2)))
+```
+
+## Funções úteis
+
+- `unique()`
+```{r}
+horas <- unique(pin$hour)
+print(horas)
+```
+
+
+## Plots simples
+
+### Série temporal
+```{r, out.height="65%"}
+plot(pin$o3, t = "l", lwd = 1.2, col = "blue")
+```
+
+
+## Plots simples
+
+### Histograma
+```{r, out.height="65%"}
+hist(pin$o3)
+```
+
+## Plots simples
+
+### boxplot
+```{r, out.height="65%"}
+boxplot(pin$o3)
+```
+
+## Plots simples
+
+### boxplot
+```{r, out.height="65%"}
+boxplot(o3~hour, data=pin)
+```
+
+## Plots simples
+
+### boxplot
+```{r, out.height="65%"}
+boxplot(o3~day, data=pin)
+```
+
+## Filtrar dados
+
+- Usamos o comando `subset(df, subset = <condição>)`
+```{r, eval = F}
+# Horas com [o3] maior que a mediana
+pin_o3_med <- subset(
+  pin, 
+  subset = o3 >= mean(pin$o3, na.rm=T)
+)
+```
+
+## Filtrar dados
+
+- Usamos o comando `subset(df, subset = <condição>)`
+```{r, echo = F}
+# Horas com [o3] maior que a mediana
+pin_o3_med <- subset(
+  pin, 
+  subset = o3 >= mean(pin$o3, na.rm=T)
+)
+head(pin_o3_med)
+```
+
+## Data!
+
+- É muito importante falar para R que temos dados tipo \alert{data} (`POSIXct`).
+```{r}
+pin$date <- paste(pin$day, pin$hour)
+head(pin)
+```
+
+## Data!
+
+- É muito importante falar para R que temos dados tipo \alert{data} (`POSIXct`).
+```{r}
+pin$date <- as.POSIXct(
+  strptime(pin$date,
+           format="%d/%m/%Y %H:%M") 
+)
+```
+- Informação sobre [formato data](https://www.geeksforgeeks.org/python-datetime-strptime-function/)
+
+## Data
+
+### Série temporal
+```{r, out.height="65%"}
+plot(pin$date, pin$o3, t = "l", lwd = 1.2, col = "blue")
+```
+
+
+# Pacotes
+
+## Pacotes
+
+-   Pacotes são como as \alert{extensões} no browser.
+-   Conjunto de \alert{funções específicas} para tarefas específicas.
+
+## Bibliotecas
+
+-   Para instalar pacotes usamos a função `install.packages("nome_do_biblioteca")`
+
+```{r, eval=FALSE}
+# Instalando Rmarkdown
+install.packages("raster")
+```
+
+## Bibliotecas
+
+-   Por exemplo, para ler arquivos `.xls` podemos instalar a biblioteca `readxls`
+
+```{r, eval=FALSE}
+# Instalando readxl
+install.packages("readxl")
+```
+
+
+## Bibliotecas
+
+- Por exemplo, para usar a base de dados do Brasil, usamos o pacote `geobr`.
+
+```{r, eval=FALSE}
+# Instalando geobr
+install.packages("geobr")
+```
+
+# Do Excel para R
+
+## Do Excel para R
+
+-   Um jeito de ler arquivos `.xls` é abrir os arquivos em Excel ou Google Sheet e salvar como `.csv`.
+-   Depois ler a tabela usando a função `read.table()`
+-   As vezes vale a pena abrir no Excel ou Google Sheet e mudar o nome das colunas.
+-   Também podemos usar a função `read_excel()` do pacote `readxl`
+
+
+# qualR
+
+## Limitações do sistema QUALAR
+
+### Plataforma é limitada:
+- Um poluente por vez (3 no modo avançado).
+- Uma estação por vez.
+- Baixar dados anuais fica devagar
+
+### Dados tem problemas.
+- Trocar separador decimal.
+- _Missing dates_: Datas faltantes
+- _Wrong date format_: Arrumar o formato das datas
+
+
+## qualR
+
+-   Pacote desenvolvido para baixar os dados da CETESB dentro do R.
+-   Gera dataset prontos e completos para análise:
+    -   Horários faltantes preenchidos com `NA`.
+    -   Coluna `date` tipo `POSIXct` para usar diretamente com `openair`.
+-   Precisa ter cadastro na plataforma [QUALAR da CETESB](https://qualar.cetesb.sp.gov.br/qualar/home.do).
+-   Referência [qualR](https://github.com/ropensci/qualR)
+
+## Instalação qualR
+
+- O jeito mais fácil é o seguinte:
+
+```{r, eval=FALSE}
+install.packages('qualR', 
+                 repos = c('https://ropensci.r-universe.dev',
+                           'https://cloud.r-project.org'))
+```
+
+## Instalação qualR
+
+```{=tex}
+\metroset{block=fill}
+\begin{alertblock}{Atenção}
+  Para usar `qualR` você precisa ter uma conta no sistema QUALAR da CETESB.
+  Você precisa do \alert{usuário} e da \alert{senha}.
+\end{alertblock}
+```
+## Códigos dos parâmetros e das estações
+
+-   Para saber os códigos das estações usamos `cetesb_aqs` na coluna `code`.
+
+```{r}
+library(qualR)
+head(cetesb_aqs, 4) 
+```
+
+## Códigos dos parâmetros e das estações
+
+-   Para saber os códigos dos parârmetros `cetesb_param` na coluna `code`.
+
+```{r}
+library(qualR)
+tail(cetesb_param, 4)
+```
+
+## Baixar um poluente de uma estação
+
+-   Vamos baixar dados de **ozônio** da **primeira semana de janeiro de 2024** na estação **Pinheiros**. Usamos a função `cetesb_retrieve_param()`.
+
+```{r, eval=FALSE}
+pin_o3 <- cetesb_retrieve_param(
+  username = Sys.getenv("QUALAR_USER"), # Trocar pelo seu usuário
+  password = Sys.getenv("QUALAR_PASS"), # Trocar pela sua senha
+  parameters = 63, # de cetesb_param
+  aqs_code = 99, # de cetesb_aqs,
+  start_date = "01/01/2024", # Formato dd/mm/yyyy
+  end_date = "07/01/2024" # Formato dd/mm/yyyy
+)
+```
+
+## Baixar um poluente de uma estação
+
+-   Também aceita o nome da estação (igual  em `cetesb_aqs`) e o nome do parâmetro (igual em `cetesb_param`).
+
+```{r, eval=FALSE}
+pin_o3 <- cetesb_retrieve_param(
+  username = Sys.getenv("QUALAR_USER"), # Trocar pelo seu usuário
+  password = Sys.getenv("QUALAR_PASS"), # Trocar pela sua senha
+  parameters = "O3", # de cetesb_param
+  aqs_code = "Pinheiros", # de cetesb_aqs,
+  start_date = "01/01/2024", # Formato dd/mm/yyyy
+  end_date = "07/01/2024" # Formato dd/mm/yyyy
+)
+```
+
+## Baixar vários poluentes de uma estação
+
+-   Também podemos baixar vários poluentes de uma estação. Só precisamos definir os poluentes para baixar em um `vetor`. Vamos baixar O$_3$, PM$_{2.5}$, e NO$_X$.
+
+```{r, eval=FALSE}
+pols <- c("O3", "MP2.5", "NOx") # Olhar usando cetesb_aqs
+pin_o3 <- cetesb_retrieve_param(
+  username = Sys.getenv("QUALAR_USER"), # Trocar pelo seu usuário
+  password = Sys.getenv("QUALAR_PASS"), # Trocar pela sua senha
+  parameters = pols, # vetor com poluentes
+  aqs_code = "Pinheiros", # de cetesb_aqs,
+  start_date = "01/01/2024", # Formato dd/mm/yyyy
+  end_date = "07/01/2024" # Formato dd/mm/yyyy
+)
+```
+
+## Baixar vários poluentes e meteorologia de uma estação
+
+-   Só precisamos definir os parâmetros para baixar em um vetor. Vamos baixar PM$_{2.5}$ e velocidade e direção do vento.
+
+```{r, eval=FALSE}
+params <- c("MP2.5", "VV", "DV") # Olhar usando cetesb_aqs
+pin_pm25 <- cetesb_retrieve_param(
+  username = Sys.getenv("QUALAR_USER"), # Trocar pelo seu usuário
+  password = Sys.getenv("QUALAR_PASS"), # Trocar pela sua senha
+  parameters = params, # vetor com poluentes
+  aqs_code = "Pinheiros", # de cetesb_aqs,
+  start_date = "01/01/2024", # Formato dd/mm/yyyy
+  end_date = "07/01/2024" # Formato dd/mm/yyyy
+)
+```
+
+## Baixar vários poluentes e meteorologia de uma estação
+
+-   Você não precisa colocar os argumentos das funções \alert{mas precisa seguir a ordem dos argumentos}.
+
+```{r, eval=FALSE}
+params <- c("MP2.5", "VV", "DV")
+pin_pm25 <- cetesb_retrieve_param(
+  Sys.getenv("QUALAR_USER"),  # username
+  Sys.getenv("QUALAR_PASS"), # password
+  params, # parameters
+  "Pinheiros", # aqs_code
+  "01/01/2024", # start_date
+  "07/01/2024" # end_date
+)
+```
+
+
+## Salvar dados em `.csv`
+- Pode ser que você precise usar outro software (e.g. [PMF](https://www.epa.gov/air-research/positive-matrix-factorization-model-environmental-data-analyses)). Então você pode exportar os dados em `.csv`. Só adicionar o argumento `to_csv = TRUE`.
+```{r, eval=FALSE}
+params <- c("MP2.5", "VV", "DV") # Olhar usando cetesb_aqs
+pin_pm25 <- cetesb_retrieve_param(
+  username = Sys.getenv("QUALAR_USER"), # Trocar pelo seu usuário
+  password = Sys.getenv("QUALAR_PASS"), # Trocar pela sua senha
+  parameters = params, # vetor com poluentes
+  aqs_code = "Pinheiros", # de cetesb_aqs,
+  start_date = "01/01/2024", # Formato dd/mm/yyyy
+  end_date = "07/01/2024", # Formato dd/mm/yyyy
+  to_csv = TRUE
+)
+```
+
+## Salvar dados em `.csv`
+- O arquivo salvo tem o nome  `Pinheiros_MP2.5_VV_DV_01-01-2024_07-01-2024.csv` e ficará na pasta de trabalho (conferir usando `getwd()`).
+
+## Um mesmo poluente de várias estações
+- As vezes você precisa comparar valores de várias estações. Neste exemplo vamos baixar valores de NO$_X$ da estação Ibirapuera e Pinheiros.
+```{r}
+aqs <- c(99, 83) # de cetesb_aqs, Pinheiros é 99 e Ibirapuera 83
+nox_pin_ibi <- lapply(
+  aqs,
+  cetesb_retrieve_param,
+  username = Sys.getenv("QUALAR_USER"),
+  password = Sys.getenv("QUALAR_PASS"),
+  parameters = "NOx",
+  start_date = "01/01/2024",
+  end_date = "07/07/2024"
+)
+```
+
+## Um mesmo poluente de várias estações
+- O resultado de usar `lapply` é uma lista. Vamos transformar em um `data.frame`.
+```{r}
+nox_all <- do.call(rbind, nox_pin_ibi)
+```
+
+## Um mesmo poluente de várias estações
+- Usando subset podemos separar os data frames.
+```{r}
+nox_pin <- subset(nox_all, subset = aqs == "Pinheiros")
+nox_ibi <- subset(nox_all, subset = aqs == "Ibirapuera")
+```
+
+##  Um mesmo poluente de várias estações
+- Vamos comparar as estações
+```{r}
+mean(nox_pin$nox, na.rm = TRUE)
+mean(nox_ibi$nox, na.rm = TRUE)
+```
+- Pinheiros tem maior concentração de NOX do que Ibirapuera. Por que?
+
+## Outras funções.
+
+- `cetesb_retrieve_param()` é a função mais importante e a mais usada.
+- Existem outras funçãoes que não precisam do argumento `parameters` pois foram desenvolvidas para baixar parâmetros específicos:
+    - `cetesb_retrieve_pol()`: Baixa todos os \alert{poluentes}.
+    - `cetesb_retrieve_met()`: Baixa todos os \alert{parâmetros meteorológicos}.
+    - `cetesb_retrieve_met_pol()`: Baixa todos os \alert{parâmetros da estação}.
+    
+# Plots
+
+## Plots
+
+- _Uma figura vale mais do que 100 palavras_.
+- Vamos aprofundar como usar **R Base Graphics** para criar os plots.
+- Seguir as _10 simple rules for better figures_ do [**Rougier et al. (2014)**](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003833)
+
+## Plots
+
+- A principal função é **`plot()`**. Podemos usar `plot()` para criar \alert{séries de tempo} e \alert{gráfico de dispersão}.
+- Outras funções são:
+    - `hist()`: Cria histogramas.
+    - `barplot()`: Diagrama de barras.
+    - `boxplot()`: Diagrama de caixas.
