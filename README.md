@@ -21,6 +21,10 @@ install.packages("binb") # Tema dos slides
 - `scripts` tem os codigos _ao vivo_ durante as aulas e outros exemplos.
 - `data` bases de dados e exemplos usados durante as aulas.
 
+## A turma
+
+![](data/photo/turma_2025.jpg)
+
 ## Temário
 
 - Aula 1: R básico e data frames.
