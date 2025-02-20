@@ -1,0 +1,269 @@
+---
+title: Introdução à Linguagem de Programação em R para tratamento de dados de poluição do ar
+subtitle: openair e R do dia dia
+author: Mario Gavidia-Calderón, Rafaela Squizzato, Thiago Nogueira
+date: 20/02/2025
+institute: Universidade de São Paulo
+output: binb::metropolis
+fontsize: 12pt
+classoption: aspectratio=169 
+toc: true
+---
+
+```{r,setup, include=FALSE}
+knitr::opts_chunk$set(cache=TRUE, warning = FALSE)
+```
+
+##
+
+- Nesta aula vamos falar sobre situações que acontecem quando trabalhamos com dados de qualidade do ar.
+- Também falaremos sobre boas praticas de R.
+- E resolver as suas dúvidas.
+
+# Dúvidas aula passada
+
+## Média das 2 pm até as 2 pm do dia seguinte
+```{r}
+library(openair)
+
+pin <- readRDS("../../data/pin_example_23_24.rds")
+pin_day <- timeAverage(pin, avg.time = "day")
+
+```
+
+## Média das 2 pm até as 2 pm do dia seguinte
+```{r}
+head(pin_day)
+```
+
+## Média das 2 pm até as 2 pm do dia seguinte
+- A estrategia é modificar o data frame `pin` para a primeira linha seja às 14:00, depois vamos _enganar_ ao R para que ache que são às 00:00
+
+```{r}
+library(openair)
+
+# Desde a linha 15 ate última linha - 11
+pin_2pm <- pin[15:(nrow(pin) - 11),  ]
+# Trocamos a coluna `date`
+names(pin_2pm)[1] <- "date_original"
+```
+
+## Média das 2 pm até as 2 pm do dia seguinte
+```{r}
+# Criamos uma nova coluna de data usando seq.
+pin_2pm$date <- seq(as.POSIXct("2023-01-01 00:00"),
+                    by = "hour",
+                    length.out = nrow(pin_2pm))
+head(pin_2pm)
+```
+
+## Média das 2 pm até as 2 pm do dia seguinte
+```{r}
+pin_day_2pm <- timeAverage(pin_2pm, avg.time = "day",
+                           vector.ws = T)
+head(pin_day_2pm)
+```
+
+## Média das 2 pm até as 2 pm do dia seguinte
+
+- Um jeito mais complicado (mas funciona) está neste [link](https://randroll.wordpress.com/2018/10/23/functions-24-hour-mean-starting-in-a-different-time-hour/).
+
+## Dia da semana e final de semana
+
+```{r}
+weekdays <- selectByDate(pin, day = "weekday")
+head(weekdays)
+```
+
+## Dia da semana e final de semana
+
+```{r}
+weekends <- selectByDate(pin, day = "weekend")
+head(weekends)
+```
+
+## Lag e exposição
+
+- Neste [trabalho](https://journals.lww.com/jasn/fulltext/2024/10001/impact_of_pm2_5_pollution_on_kidney_diseases_in.2613.aspx) foi usado _Distributed Lag Nonlinear Models_, the [`dlnm` package](https://github.com/gasparrini/dlnm). 
+
+# Média móvel
+
+
+
+## Média móvel
+
+- O padrão qualidade do ar em [São Paulo](https://cetesb.sp.gov.br/ar/padroes-de-qualidade-do-ar/) de O$_3$ é a \alert{média móvel de 8 horas}.
+- Outro padrão da [**WHO**](https://www.who.int/news-room/feature-stories/detail/what-are-the-who-air-quality-guidelines) é a \alert{MDA8} (_average of daily maximun 8-hour_) e também \alert{Peak season}.
+- `openair` conta com a função `rollingMean()` para fazer esses padrões.
+
+## Média móvel
+
+- Vamos calcular o padrão de qualidade do ar de O$_3$ para CETESB no 2021.
+```{r, eval=FALSE}
+library(openair)
+# Lendo o arquivo
+pin <- readRDS('../../data/pin_openair_ex.rds')
+pin_2021 <- selectByDate(pin, year = 2021)
+# Média móvel
+pin_2021 <- rollingMean(
+  pin_2021,
+  pollutant = 'o3',
+  width = 8,
+  new.name = "o3_8h",
+  data.thresh = 0.75)
+```
+
+## Média móvel
+- Foi criada a coluna **`o3_8h`**.
+```{r, echo=FALSE}
+library(openair)
+# Lendo o arquivo
+pin <- readRDS('../../data/pin_openair_ex.rds')
+pin_2021 <- selectByDate(pin, year = 2021)
+# Média móvel
+pin_2021 <- rollingMean(
+  pin_2021,
+  pollutant = 'o3',
+  width = 8, # 8 por que é cada 8 horas
+  new.name = "o3_8h" # nome nova coluna
+)
+head(pin_2021)
+```
+
+## Exercício 1
+
+A MDA8 é a média móvel **máxima diária**. Como seria calculada?
+
+## Script do exercício 1: MDA8
+```{r}
+library(openair)
+pin_mda8 <- timeAverage(pin_2021[c("date", "o3_8h")], 
+                        avg.time = "day", # Diária
+                        statistic = "max") # Máxima
+head(pin_mda8)
+```
+## Exercício 2
+
+Quantos dias foi superado o padrão de O$_3$ na estação Pinheiros?
+
+## Script exercício 2
+
+Podemos usar `subset`. O padrão é 130 $\mu g m^{-3}$.
+```{r}
+dias_o3 <- subset(pin_mda8, 
+                  subset = o3_8h >= 130)
+print(
+  paste("O padrão foi superado ", nrow(dias_o3), "dias")
+)
+```
+
+# Combinar data frames
+
+## Combinar data frames
+- Muitas vezes precisamos combinar duas tabelas que tem uma coluna comun. Por exemplo se temos uma tabela com a média anual de O$_3$ das estações e outra tabela com a média anual de PM$_{2.5}$, para isso usamos `merge()`.
+
+## Combinar data frames
+```{r}
+o3 <- data.frame(aqs = c("pin", "ibu", "usp", "fsp"),
+                 o3 = runif(4, 0, 160))
+pm25 <- data.frame(aqs = c("pin", "ibu", "usp", "fsp"),
+                   pm25 = runif(4, 10, 60))
+dados <- merge(o3, pm25)
+dados
+```
+
+## Completar dados faltantes
+- Podemos usar o `merge` para completar com `NA` se um data frame não tem uma linha de dados.
+- Precisamos adicionar o argumento `all = TRUE`.
+- Serve para detectar quantos dados faltantes existem na nossa base de dados.
+
+## Completar dados faltantes
+```{r}
+o3 <- data.frame(aqs = c("pin", "ibu", "usp", "fsp"),
+                 o3 = runif(4, 0, 160))
+pm25 <- data.frame(aqs = c("pin", "ibu", "usp"),
+                   pm25 = runif(3, 10, 60))
+dados <- merge(o3, pm25, all = TRUE)
+dados
+```
+
+# Transformar tipos de objetos
+
+## `character` para `numeric`
+- Às vezes quando usamos `read.table` ou `read_excel`, se uma coluna tem o dado faltante como um character especial (e.g "M"). Para poder operar precisamos forçar a transformação para `numeric`.
+
+## `character` para `numeric`
+```{r}
+o3 <- c(90, 89, 76, 83, "M")
+class(o3)
+o3 <- as.numeric(o3) # Atualizamos o valor do vetor o3
+class(o3)
+o3
+```
+
+## Transformar zona horária
+- Fontes de dados globais podem ter a zona horária em UTC. Você precisa trazer para horário local.
+```{r}
+# Criamos uma base de dados 
+date <- seq(as.POSIXct("2024-01-01 00:00", tz = "UTC"),
+            length.out = 30 * 24, by = "hour")
+o3 <- runif(length(date), 100, 160)
+df <- data.frame(date, o3)
+head(df$date)
+```
+
+## Transformar zona horária
+```{r}
+attributes(df$date)$tzone <- "America/Sao_Paulo"
+head(df$date)
+```
+
+# Boas praticas do R
+- Para cada trabalho usar RStudio Projects:
+    - Mais fácil de compartilhar. Não precisa definir o caminho dos inputs.
+- É bom olhar guias de estilo do R.
+    - [Google R guide](https://web.stanford.edu/class/cs109l/unrestricted/resources/google-style.html):
+        - Usar `<-` para definir variavéis.
+        - Usar `=` para os argumntos.
+        - Usar espaços para separar argumentos e `=`.
+        - Usar nome significativos das variavéis.
+
+
+# Mais recursos.
+
+## Base de dados
+- Dados dos aeroportos: [`riem` package](https://docs.ropensci.org/riem/)
+- Dados do brazil geobr [`geobr` package](https://github.com/ipeaGIT/geobr)
+- Dados qualidade do ar São Paulo: [`qualR` package](https://github.com/ropensci/qualR)
+- Dados DATASUS: [`DATASUS` package](https://github.com/danicat/datasus)
+- Dados DATASUS: [`microdatasus` package](https://github.com/rfsaldanha/microdatasus?tab=readme-ov-file)
+- Dados de qualidade do ar: [*openaq*](https://openaq.org/#/countries?_k=vx9kky)
+
+## Sobre R
+
+- Funções do R: [**R reference card**](https://cran.r-project.org/doc/contrib/Short-refcard.pdf)
+- Galeria de figuras no R: [**The R Graph Gallery**](https://r-graph-gallery.com/index.html)
+- RStudio folha de dicas: [**RStudio cheat sheet**](https://rstudio.github.io/cheatsheets/rstudio-ide.pdf)
+
+# e agora?
+
+## e agora?
+
+```{r, echo=FALSE, fig.align='center', out.height="70%", out.width="40%"}
+library(knitr)
+include_graphics("figures/adventure_time_jake.jpg")
+```
+
+## e agora?
+
+- Tem que começar usar R (em vez de Excel)
+- Procurar no google _R package \<o que eu preciso\>_
+- Podem explorar [**tidyverse**](https://www.tidyverse.org/).
+- Podem também nos escrever!
+
+
+
+
+---
+
+Muito Obrigado e boa prática!
